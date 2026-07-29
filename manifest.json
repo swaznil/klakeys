@@ -2,18 +2,16 @@
   "manifest_version": 3,
   "name": "Klakeys",
   "version": "0.1.0",
-  "description": "Make every keystroke satisfying with mechanical keyboard sounds.",
+  "description": "Mechanical keyboard sounds for your browser.",
 
-  "permissions": [
-    "storage"
-  ],
+  "permissions": ["storage"],
 
   "background": {
     "service_worker": "background.js"
   },
 
   "action": {
-    "default_title": "klakeys",
+    "default_title": "Klakeys",
     "default_popup": "popup.html"
   },
 
@@ -21,7 +19,8 @@
     {
       "matches": ["<all_urls>"],
       "js": ["content.js"],
-      "run_at": "document_start"
+      "run_at": "document_start",
+      "all_frames": true
     }
   ],
 

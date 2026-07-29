@@ -1,6 +1,6 @@
 const DEFAULT_SETTINGS = {
   enabled: true,
-  volume: 0.45
+  volume: 0.3,
 };
 
 let settings = { ...DEFAULT_SETTINGS };
@@ -9,7 +9,7 @@ const soundPaths = {
   key: "sounds/key.mp3",
   space: "sounds/space.mp3",
   enter: "sounds/enter.mp3",
-  backspace: "sounds/backspace.mp3"
+  backspace: "sounds/backspace.mp3",
 };
 
 const POOL_SIZE = 8;
@@ -26,8 +26,43 @@ for (const [soundName, soundPath] of Object.entries(soundPaths)) {
   poolIndexes[soundName] = 0;
 }
 
+function isTypingTarget(target) {
+  if (!(target instanceof Element)) {
+    return false;
+  }
+
+  const tagName = target.tagName.toLowerCase();
+
+  return (
+    tagName === "input" ||
+    tagName === "textarea" ||
+    target.isContentEditable ||
+    target.closest("[contenteditable='true']")
+  );
+}
+
+function getSoundName(event) {
+  if (event.key === " ") {
+    return "space";
+  }
+
+  if (event.key === "Enter") {
+    return "enter";
+  }
+
+  if (event.key === "Backspace" || event.key === "Delete") {
+    return "backspace";
+  }
+
+  if (event.key.length === 1) {
+    return "key";
+  }
+
+  return null;
+}
+
 function playSound(soundName) {
-  if (!settings.enabled) {
+  if (!settings.enabled || !soundName) {
     return;
   }
 
@@ -45,28 +80,10 @@ function playSound(soundName) {
   audio.volume = settings.volume;
 
   audio.play().catch(() => {
-    // Some pages may temporarily block audio playback.
+    // Some pages may block audio for a moment.
   });
 
   poolIndexes[soundName] = (index + 1) % pool.length;
-}
-
-function getSoundName(event) {
-  switch (event.code) {
-    case "Space":
-      return "space";
-
-    case "Enter":
-    case "NumpadEnter":
-      return "enter";
-
-    case "Backspace":
-    case "Delete":
-      return "backspace";
-
-    default:
-      return "key";
-  }
 }
 
 chrome.storage.local.get(DEFAULT_SETTINGS, (savedSettings) => {
@@ -94,7 +111,12 @@ document.addEventListener(
       return;
     }
 
-    playSound(getSoundName(event));
+    if (!isTypingTarget(event.target)) {
+      return;
+    }
+
+    const soundName = getSoundName(event);
+    playSound(soundName);
   },
-  true
+  true,
 );

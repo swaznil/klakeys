@@ -1,6 +1,6 @@
 const DEFAULT_SETTINGS = {
   enabled: true,
-  volume: 0.45
+  volume: 0.3
 };
 
 chrome.runtime.onInstalled.addListener(() => {

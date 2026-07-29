@@ -2,13 +2,51 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <metaname="viewport"content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>Klakeys</title>
   <link rel="stylesheet" href="popup.css">
 </head>
 
 <body>
+
+<main class="popup">
+
+  <header>
+    <h1>Klakeys</h1>
+    <p>Mechanical keyboard sounds for your browser.</p>
+  </header>
+
+  <section class="setting">
+    <div>
+      <strong>Sounds</strong>
+      <span id="statusText">Enabled</span>
+    </div>
+
+    <label class="switch">
+      <input id="enabledToggle" type="checkbox">
+      <span class="slider"></span>
+    </label>
+  </section>
+
+  <section class="volume-section">
+    <div class="volume-heading">
+      <label for="volumeSlider">Volume</label>
+      <span id="volumeValue">45%</span>
+    </div>
+
+    <input
+      id="volumeSlider"
+      type="range"
+      min="0"
+      max="100"
+      value="45">
+  </section>
+
+  <footer>
+    v0.1
+  </footer>
+</main>
 
 <script src="popup.js"></script>
 </body>

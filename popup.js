@@ -5,7 +5,7 @@ const volumeValue = document.querySelector("#volumeValue");
 
 const DEFAULT_SETTINGS = {
   enabled: true,
-  volume: 0.3
+  volume: 0.3,
 };
 
 function updateStatus(enabled) {

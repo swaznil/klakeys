@@ -1,0 +1,115 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  width: 280px;
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #202124;
+  background: #f8f9fa;
+}
+
+.popup {
+  padding: 16px;
+}
+
+header {
+  margin-bottom: 18px;
+}
+
+h1 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #111;
+}
+
+header p {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: #666;
+}
+
+.setting,
+.volume-section {
+  padding: 14px 0;
+  border-top: 1px solid #ddd;
+}
+
+.setting {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.setting strong,
+.volume-heading label {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.setting span,
+#volumeValue {
+  display: block;
+  margin-top: 3px;
+  font-size: 12px;
+  color: #666;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 36px;
+  height: 20px;
+}
+
+.switch input {
+  display: none;
+}
+
+.slider {
+  position: absolute;
+  inset: 0;
+  cursor: pointer;
+  background: #bbb;
+  border-radius: 20px;
+}
+
+.slider::before {
+  position: absolute;
+  content: "";
+  width: 16px;
+  height: 16px;
+  left: 2px;
+  top: 2px;
+  background: white;
+  border-radius: 50%;
+}
+
+.switch input:checked + .slider {
+  background: #333;
+}
+
+.switch input:checked + .slider::before {
+  transform: translateX(16px);
+}
+
+.volume-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+input[type="range"] {
+  width: 100%;
+}
+
+footer {
+  padding-top: 12px;
+  border-top: 1px solid #ddd;
+  font-size: 11px;
+  color: #777;
+  text-align: center;
+}
