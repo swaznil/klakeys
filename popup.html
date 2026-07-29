@@ -3,88 +3,97 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <title>Klakeys</title>
   <link rel="stylesheet" href="popup.css">
 </head>
 
 <body>
   <main class="popup">
-    <header>
+    <header class="header">
       <div>
         <h1>Klakeys</h1>
-        <p>Mechanical sounds while you type.</p>
+        <p>Keyboard sound and typing pace.</p>
       </div>
-
       <span id="version" class="version" aria-label="Extension version"></span>
     </header>
 
-    <section class="setting">
-      <div>
-        <strong>Keyboard sounds</strong>
-        <span id="statusText" role="status">Enabled</span>
+    <section class="section" aria-labelledby="soundHeading">
+      <div class="section-title">
+        <h2 id="soundHeading">Sound</h2>
+        <span id="statusText" class="state" role="status">On</span>
       </div>
 
-      <label class="switch">
+      <label class="option">
+        <span>
+          <strong>Keyboard sounds</strong>
+          <small>Play sounds in text fields</small>
+        </span>
         <input
           id="enabledToggle"
+          class="check"
           type="checkbox"
           aria-label="Enable keyboard sounds"
         >
-        <span class="slider"></span>
+      </label>
+
+      <div class="volume">
+        <div class="volume-label">
+          <label for="volumeSlider">Volume</label>
+          <output id="volumeValue" for="volumeSlider">30%</output>
+        </div>
+        <input
+          id="volumeSlider"
+          type="range"
+          min="0"
+          max="100"
+          step="1"
+          value="30"
+          aria-describedby="volumeValue"
+        >
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="displayHeading">
+      <h2 id="displayHeading">Display</h2>
+      <label class="option">
+        <span>
+          <strong>Floating WPM</strong>
+          <small>Keep your current pace visible on webpages</small>
+        </span>
+        <input
+          id="overlayToggle"
+          class="check"
+          type="checkbox"
+          aria-label="Always show floating WPM"
+        >
       </label>
     </section>
 
-    <section class="volume-section">
-      <div class="section-heading">
-        <label for="volumeSlider">Volume</label>
-        <span id="volumeValue">30%</span>
-      </div>
-
-      <input
-        id="volumeSlider"
-        type="range"
-        min="0"
-        max="100"
-        step="1"
-        value="30"
-        aria-describedby="volumeValue"
-      >
-    </section>
-
-    <section class="stats-section">
-      <div class="section-heading">
+    <section class="section stats-section" aria-labelledby="statsHeading">
+      <div class="section-title">
         <div>
-          <strong>Today</strong>
-          <span id="statsDate"></span>
+          <h2 id="statsHeading">Today</h2>
+          <span id="statsDate" class="date"></span>
         </div>
-
-        <button id="resetStatsButton" type="button" title="Reset today's stats">
+        <button id="resetStatsButton" class="text-button" type="button">
           Reset
         </button>
       </div>
 
-      <div class="stats-grid">
+      <div class="stats">
         <div class="stat">
           <span class="stat-value" id="wpmValue">0</span>
           <span class="stat-label">WPM</span>
         </div>
-
-        <div class="stat">
-          <span class="stat-value" id="keystrokeValue">0</span>
-          <span class="stat-label">Keys</span>
-        </div>
-
         <div class="stat">
           <span class="stat-value" id="wordValue">0</span>
-          <span class="stat-label">Words</span>
+          <span class="stat-label">Words typed</span>
         </div>
       </div>
     </section>
 
-    <footer>
-      <span>Sounds only work inside webpages.</span>
-    </footer>
+    <p id="message" class="message" role="status" aria-live="polite"></p>
+    <footer>Reload open pages after updating the extension.</footer>
   </main>
 
   <script src="popup.js"></script>

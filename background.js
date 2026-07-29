@@ -1,12 +1,13 @@
 const DEFAULT_SETTINGS = {
   enabled: true,
   volume: 0.3,
+  showWpmOverlay: false,
 };
 
 const EMPTY_STATS = {
   date: "",
-  keystrokes: 0,
   characters: 0,
+  words: 0,
   latestWpm: 0,
 };
 
@@ -49,8 +50,12 @@ function normalizeStats(value) {
 
   return {
     date: today,
-    keystrokes: Math.floor(toNonNegativeNumber(stats.keystrokes)),
     characters: Math.floor(toNonNegativeNumber(stats.characters)),
+    words: Math.floor(
+      toNonNegativeNumber(
+        stats.words ?? Math.floor(toNonNegativeNumber(stats.characters) / 5),
+      ),
+    ),
     latestWpm: Math.round(toNonNegativeNumber(stats.latestWpm)),
   };
 }
@@ -78,8 +83,8 @@ async function getStats() {
 async function recordTyping(data) {
   const stats = await getStats();
 
-  stats.keystrokes += Math.floor(toNonNegativeNumber(data.keystrokes));
   stats.characters += Math.floor(toNonNegativeNumber(data.characters));
+  stats.words += Math.floor(toNonNegativeNumber(data.words));
   stats.latestWpm = Math.round(toNonNegativeNumber(data.wpm));
 
   await chrome.storage.local.set({
@@ -109,6 +114,7 @@ chrome.runtime.onInstalled.addListener(() => {
       chrome.storage.local.set({
         enabled: savedSettings.enabled !== false,
         volume: normalizeVolume(savedSettings.volume),
+        showWpmOverlay: savedSettings.showWpmOverlay === true,
       }),
     )
     .then(() => getStats())

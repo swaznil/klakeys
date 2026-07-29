@@ -1,6 +1,7 @@
 const DEFAULT_SETTINGS = {
   enabled: true,
   volume: 0.3,
+  showWpmOverlay: false,
 };
 
 let settings = { ...DEFAULT_SETTINGS };
@@ -41,10 +42,13 @@ for (const [soundName, soundPath] of Object.entries(soundPaths)) {
 
 const recentCharacterTimes = [];
 
-let pendingKeystrokes = 0;
 let pendingCharacters = 0;
+let pendingWords = 0;
 let lastSentWpm = 0;
 let statsMessageInFlight = false;
+let hasOpenWord = false;
+let wpmOverlayHost = null;
+let wpmOverlayValue = null;
 
 function removeOldCharacterTimes() {
   const oneMinuteAgo = Date.now() - 60_000;
@@ -74,8 +78,6 @@ function calculateWpm() {
 }
 
 function recordTypingEvent(event) {
-  pendingKeystrokes += 1;
-
   const isCharacter =
     event.key.length === 1 || event.key === "Enter" || event.key === "Tab";
 
@@ -85,11 +87,107 @@ function recordTypingEvent(event) {
 
   pendingCharacters += 1;
   recentCharacterTimes.push(Date.now());
+
+  const isWordBoundary =
+    event.key === " " || event.key === "Enter" || event.key === "Tab";
+
+  if (isWordBoundary) {
+    if (hasOpenWord) {
+      pendingWords += 1;
+      hasOpenWord = false;
+    }
+  } else {
+    hasOpenWord = true;
+  }
+
+  updateWpmOverlay(calculateWpm());
 }
 
 function stopExtensionActivity() {
   extensionContextActive = false;
   clearInterval(statsInterval);
+  removeWpmOverlay();
+}
+
+function createWpmOverlay() {
+  if (wpmOverlayHost || !document.documentElement) {
+    return;
+  }
+
+  wpmOverlayHost = document.createElement("div");
+  wpmOverlayHost.id = "klakeys-wpm-overlay";
+
+  const shadowRoot = wpmOverlayHost.attachShadow({ mode: "closed" });
+  const style = document.createElement("style");
+  style.textContent = `
+    :host {
+      all: initial;
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      z-index: 2147483647;
+      pointer-events: none;
+    }
+
+    .counter {
+      display: flex;
+      align-items: baseline;
+      gap: 5px;
+      padding: 7px 9px;
+      color: #171717;
+      font: 600 13px/1.2 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #ffffff;
+      border: 1px solid #d8d8d8;
+      border-radius: 3px;
+    }
+
+    .label {
+      color: #6a6a6a;
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+    }
+  `;
+
+  const counter = document.createElement("div");
+  counter.className = "counter";
+
+  wpmOverlayValue = document.createElement("span");
+  wpmOverlayValue.textContent = "0";
+
+  const label = document.createElement("span");
+  label.className = "label";
+  label.textContent = "WPM";
+
+  counter.append(wpmOverlayValue, label);
+  shadowRoot.append(style, counter);
+  document.documentElement.append(wpmOverlayHost);
+}
+
+function removeWpmOverlay() {
+  wpmOverlayHost?.remove();
+  wpmOverlayHost = null;
+  wpmOverlayValue = null;
+}
+
+function syncWpmOverlay() {
+  if (settings.showWpmOverlay && extensionContextActive) {
+    createWpmOverlay();
+    updateWpmOverlay(calculateWpm());
+    return;
+  }
+
+  removeWpmOverlay();
+}
+
+function updateWpmOverlay(wpm) {
+  if (settings.showWpmOverlay && !wpmOverlayHost) {
+    createWpmOverlay();
+  }
+
+  if (wpmOverlayValue) {
+    wpmOverlayValue.textContent = String(Math.max(0, Math.round(wpm)));
+  }
 }
 
 function sendStats() {
@@ -108,18 +206,19 @@ function sendStats() {
   }
 
   const currentWpm = calculateWpm();
+  updateWpmOverlay(currentWpm);
 
   if (
-    pendingKeystrokes === 0 &&
     pendingCharacters === 0 &&
+    pendingWords === 0 &&
     currentWpm === lastSentWpm
   ) {
     return;
   }
 
   const data = {
-    keystrokes: pendingKeystrokes,
     characters: pendingCharacters,
+    words: pendingWords,
     wpm: currentWpm,
   };
 
@@ -145,8 +244,8 @@ function sendStats() {
           return;
         }
 
-        pendingKeystrokes = Math.max(0, pendingKeystrokes - data.keystrokes);
         pendingCharacters = Math.max(0, pendingCharacters - data.characters);
+        pendingWords = Math.max(0, pendingWords - data.words);
         lastSentWpm = currentWpm;
       },
     );
@@ -248,7 +347,9 @@ try {
     settings = {
       enabled: savedSettings.enabled !== false,
       volume: normalizeVolume(savedSettings.volume),
+      showWpmOverlay: savedSettings.showWpmOverlay === true,
     };
+    syncWpmOverlay();
   });
 
   chrome.storage.onChanged.addListener((changes, areaName) => {
@@ -262,6 +363,11 @@ try {
 
     if (changes.volume) {
       settings.volume = normalizeVolume(changes.volume.newValue);
+    }
+
+    if (changes.showWpmOverlay) {
+      settings.showWpmOverlay = changes.showWpmOverlay.newValue === true;
+      syncWpmOverlay();
     }
   });
 } catch {

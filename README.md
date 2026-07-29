@@ -1,21 +1,30 @@
-# Klakeys 
+# Klakeys
 
-**Klakeys** is a browser extension that makes typing feel more satisfying by adding mechanical keyboard sound effect when typing.
+Klakeys is a lightweight Chrome extension that adds subtle mechanical-keyboard
+sounds while you type.
 
-## Current Goals
+## Features
 
-* Mechanical keyboard sound effects
-* Adjustable volume
-* Lightweight
+- Distinct sounds for regular keys, Space, Enter, and Backspace
+- Adjustable volume and a quick on/off switch
+- Live WPM and completed-word counts for the current day
+- Optional floating WPM counter that stays visible on webpages
+- Local-only settings and statistics
 
-## Planned Features
+## Install locally
 
-* Live WPM tracker
-* Daily typing stats
-* Customizable sounds
-* Custom profiles
-* Typing heatmap
+1. Open `chrome://extensions`.
+2. Enable **Developer mode**.
+3. Choose **Load unpacked** and select this folder.
+4. Open a regular webpage and start typing in an input or text area.
 
----
+Klakeys cannot run on Chrome's internal pages, the Chrome Web Store, or pages
+that were already open when the extension was first installed. Reload an
+existing page once after installing or updating the extension.
 
-Built for fun and learning
+## Planned
+
+- Custom sound packs and profiles
+- Typing heatmap
+
+Built for fun and learning.
