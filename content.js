@@ -2,6 +2,7 @@ const DEFAULT_SETTINGS = {
   enabled: true,
   volume: 0.3,
   showWpmOverlay: false,
+  excludedSites: [],
 };
 
 let settings = { ...DEFAULT_SETTINGS };
@@ -133,19 +134,22 @@ function createWpmOverlay() {
       display: flex;
       align-items: baseline;
       gap: 5px;
-      padding: 7px 9px;
-      color: #171717;
+      padding: 8px 11px;
+      color: #ffffff;
       font: 600 13px/1.2 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: #ffffff;
-      border: 1px solid #d8d8d8;
-      border-radius: 3px;
+      background: rgba(20, 20, 24, 0.62);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 999px;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.18);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
     }
 
     .label {
-      color: #6a6a6a;
+      color: rgba(255, 255, 255, 0.72);
       font-size: 9px;
-      font-weight: 600;
-      letter-spacing: 0.06em;
+      font-weight: 700;
+      letter-spacing: 0.08em;
     }
   `;
 
@@ -171,7 +175,11 @@ function removeWpmOverlay() {
 }
 
 function syncWpmOverlay() {
-  if (settings.showWpmOverlay && extensionContextActive) {
+  if (
+    settings.showWpmOverlay &&
+    extensionContextActive &&
+    !isExcludedSite()
+  ) {
     createWpmOverlay();
     updateWpmOverlay(calculateWpm());
     return;
@@ -338,6 +346,22 @@ function normalizeVolume(volume) {
   return Math.min(1, Math.max(0, parsedVolume));
 }
 
+function normalizeExcludedSites(value) {
+  return Array.isArray(value)
+    ? value
+        .map((site) => String(site).trim().toLowerCase())
+        .filter(Boolean)
+    : [];
+}
+
+function isExcludedSite() {
+  const hostname = window.location.hostname.toLowerCase();
+
+  return settings.excludedSites.some(
+    (site) => hostname === site || hostname.endsWith(`.${site}`),
+  );
+}
+
 try {
   chrome.storage.local.get(DEFAULT_SETTINGS, (savedSettings) => {
     if (chrome.runtime.lastError) {
@@ -348,6 +372,7 @@ try {
       enabled: savedSettings.enabled !== false,
       volume: normalizeVolume(savedSettings.volume),
       showWpmOverlay: savedSettings.showWpmOverlay === true,
+      excludedSites: normalizeExcludedSites(savedSettings.excludedSites),
     };
     syncWpmOverlay();
   });
@@ -369,6 +394,11 @@ try {
       settings.showWpmOverlay = changes.showWpmOverlay.newValue === true;
       syncWpmOverlay();
     }
+
+    if (changes.excludedSites) {
+      settings.excludedSites = normalizeExcludedSites(changes.excludedSites.newValue);
+      syncWpmOverlay();
+    }
   });
 } catch {
   stopExtensionActivity();
@@ -386,6 +416,10 @@ document.addEventListener(
     }
 
     if (!isTypingTarget(event.target)) {
+      return;
+    }
+
+    if (isExcludedSite()) {
       return;
     }
 

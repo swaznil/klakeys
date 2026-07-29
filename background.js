@@ -2,6 +2,7 @@ const DEFAULT_SETTINGS = {
   enabled: true,
   volume: 0.3,
   showWpmOverlay: false,
+  excludedSites: [],
 };
 
 const EMPTY_STATS = {
@@ -35,6 +36,17 @@ function normalizeVolume(value) {
   }
 
   return Math.min(1, Math.max(0, volume));
+}
+
+function normalizeExcludedSites(value) {
+  return Array.isArray(value)
+    ? [...new Set(
+        value
+          .map((site) => String(site).trim().toLowerCase())
+          .map((site) => site.replace(/^https?:\/\//, "").replace(/\/.*$/, ""))
+          .filter(Boolean),
+      )]
+    : [];
 }
 
 function normalizeStats(value) {
@@ -115,6 +127,7 @@ chrome.runtime.onInstalled.addListener(() => {
         enabled: savedSettings.enabled !== false,
         volume: normalizeVolume(savedSettings.volume),
         showWpmOverlay: savedSettings.showWpmOverlay === true,
+        excludedSites: normalizeExcludedSites(savedSettings.excludedSites),
       }),
     )
     .then(() => getStats())

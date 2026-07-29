@@ -69,6 +69,28 @@
       </label>
     </section>
 
+    <section class="section" aria-labelledby="exceptionsHeading">
+      <h2 id="exceptionsHeading">Site exceptions</h2>
+
+      <label class="exceptions-label" for="excludedSites">
+        Disable Klakeys on these sites
+      </label>
+      <textarea
+        id="excludedSites"
+        rows="4"
+        placeholder="example.com&#10;docs.google.com"
+        spellcheck="false"
+      ></textarea>
+
+      <small class="help-text">
+        Add one domain per line. Subdomains are included.
+      </small>
+
+      <button id="saveExceptionsButton" class="text-button" type="button">
+        Save sites
+      </button>
+    </section>
+
     <section class="section stats-section" aria-labelledby="statsHeading">
       <div class="section-title">
         <div>
@@ -93,7 +115,6 @@
     </section>
 
     <p id="message" class="message" role="status" aria-live="polite"></p>
-    <footer>Reload open pages after updating the extension.</footer>
   </main>
 
   <script src="popup.js"></script>

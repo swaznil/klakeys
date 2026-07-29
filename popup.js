@@ -1,3 +1,4 @@
+// DOM elements
 const enabledToggle = document.querySelector("#enabledToggle");
 const overlayToggle = document.querySelector("#overlayToggle");
 const statusText = document.querySelector("#statusText");
@@ -9,16 +10,21 @@ const statsDate = document.querySelector("#statsDate");
 const resetStatsButton = document.querySelector("#resetStatsButton");
 const version = document.querySelector("#version");
 const message = document.querySelector("#message");
+const excludedSites = document.querySelector("#excludedSites");
+const saveExceptionsButton = document.querySelector("#saveExceptionsButton");
 
+// Default extension settings
 const DEFAULT_SETTINGS = {
   enabled: true,
   volume: 0.3,
   showWpmOverlay: false,
+  excludedSites: [],
 };
 
 let messageTimer;
 let previewAudio;
 
+// Value formatting and validation
 function normalizeVolume(value) {
   const volume = Number(value);
 
@@ -40,21 +46,10 @@ function setMessage(text) {
   }
 }
 
-function updateSoundState(enabled) {
-  enabledToggle.checked = enabled;
-  statusText.textContent = enabled ? "On" : "Off";
-  volumeSlider.disabled = !enabled;
-}
-
-function updateVolume(value) {
-  const percentage = Math.round(normalizeVolume(value) * 100);
-  volumeSlider.value = percentage;
-  volumeValue.value = `${percentage}%`;
-}
-
 function formatNumber(value) {
   const number = Number(value);
   const safeNumber = Number.isFinite(number) ? Math.max(0, number) : 0;
+
   return new Intl.NumberFormat("en-US").format(Math.round(safeNumber));
 }
 
@@ -64,10 +59,39 @@ function formatDate(dateString) {
   }
 
   const date = new Date(`${dateString}T00:00:00`);
+
   return new Intl.DateTimeFormat("en-US", {
     month: "short",
     day: "numeric",
   }).format(date);
+}
+
+function normalizeExcludedSites(value) {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return [
+    ...new Set(
+      value
+        .map((site) => String(site).trim().toLowerCase())
+        .filter(Boolean),
+    ),
+  ];
+}
+
+// Popup UI updates
+function updateSoundState(enabled) {
+  enabledToggle.checked = enabled;
+  statusText.textContent = enabled ? "On" : "Off";
+  volumeSlider.disabled = !enabled;
+}
+
+function updateVolume(value) {
+  const percentage = Math.round(normalizeVolume(value) * 100);
+
+  volumeSlider.value = percentage;
+  volumeValue.value = `${percentage}%`;
 }
 
 function updateStats(value) {
@@ -80,27 +104,13 @@ function updateStats(value) {
   statsDate.textContent = formatDate(stats.date);
 }
 
+// Storage and background communication
 function saveSetting(setting, value) {
   chrome.storage.local.set({ [setting]: value }, () => {
     if (chrome.runtime.lastError) {
       setMessage("Could not save that setting.");
     }
   });
-}
-
-function previewVolume() {
-  if (!enabledToggle.checked || Number(volumeSlider.value) === 0) {
-    return;
-  }
-
-  if (!previewAudio) {
-    previewAudio = new Audio(chrome.runtime.getURL("sounds/key.mp3"));
-  }
-
-  previewAudio.pause();
-  previewAudio.currentTime = 0;
-  previewAudio.volume = normalizeVolume(Number(volumeSlider.value) / 100);
-  previewAudio.play().catch(() => {});
 }
 
 function requestStats() {
@@ -116,6 +126,23 @@ function requestStats() {
   });
 }
 
+// Play one key sound when the volume changes
+function previewVolume() {
+  if (!enabledToggle.checked || Number(volumeSlider.value) === 0) {
+    return;
+  }
+
+  if (!previewAudio) {
+    previewAudio = new Audio(chrome.runtime.getURL("sounds/key.mp3"));
+  }
+
+  previewAudio.pause();
+  previewAudio.currentTime = 0;
+  previewAudio.volume = normalizeVolume(Number(volumeSlider.value) / 100);
+  previewAudio.play().catch(() => {});
+}
+
+// Load the current extension state
 version.textContent = `v${chrome.runtime.getManifest().version}`;
 
 chrome.storage.local.get(DEFAULT_SETTINGS, (settings) => {
@@ -127,8 +154,10 @@ chrome.storage.local.get(DEFAULT_SETTINGS, (settings) => {
   updateSoundState(settings.enabled !== false);
   updateVolume(settings.volume);
   overlayToggle.checked = settings.showWpmOverlay === true;
+  excludedSites.value = normalizeExcludedSites(settings.excludedSites).join("\n");
 });
 
+// User controls
 enabledToggle.addEventListener("change", () => {
   updateSoundState(enabledToggle.checked);
   saveSetting("enabled", enabledToggle.checked);
@@ -136,6 +165,24 @@ enabledToggle.addEventListener("change", () => {
 
 overlayToggle.addEventListener("change", () => {
   saveSetting("showWpmOverlay", overlayToggle.checked);
+});
+
+saveExceptionsButton.addEventListener("click", () => {
+  const sites = normalizeExcludedSites(excludedSites.value.split(/\r?\n/));
+
+  chrome.storage.local.set({ excludedSites: sites }, () => {
+    if (chrome.runtime.lastError) {
+      setMessage("Could not save site exceptions.");
+      return;
+    }
+
+    excludedSites.value = sites.join("\n");
+    setMessage(
+      sites.length
+        ? "Site exceptions saved."
+        : "All sites are enabled.",
+    );
+  });
 });
 
 volumeSlider.addEventListener("input", () => {
@@ -165,6 +212,7 @@ resetStatsButton.addEventListener("click", () => {
   });
 });
 
+// Keep the popup synchronized with storage changes
 chrome.storage.onChanged.addListener((changes, areaName) => {
   if (areaName !== "local") {
     return;
@@ -185,6 +233,13 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
   if (changes.showWpmOverlay) {
     overlayToggle.checked = changes.showWpmOverlay.newValue === true;
   }
+
+  if (changes.excludedSites) {
+    excludedSites.value = normalizeExcludedSites(
+      changes.excludedSites.newValue,
+    ).join("\n");
+  }
 });
 
+// Initial stats request
 requestStats();
