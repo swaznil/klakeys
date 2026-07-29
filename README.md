@@ -1,27 +1,27 @@
 # Klakeys
 
 Klakeys is a lightweight Chrome extension that adds subtle mechanical-keyboard
-sounds while you type along with a option to view live words per minute.
+sounds as you type, along with an option to view live words per minute (WPM).
 
 ## Features
 
 - Distinct sounds for regular keys, Space, Enter, and Backspace
-- Adjustable volume and a quick on/off switch
-- Live WPM and completed-word counts for the current day
+- Adjustable volume and a quick on/off toggle
+- Live WPM and completed word count for the current day
 - Optional floating WPM counter that stays visible on webpages
-- Local-only settings and statistics
+- All settings and statistics are stored locally
 
 ---
 
-## Screenshots 
+## Screenshots
 
-![Klakeys Popup window](images/popupscreenshot.png)
+![Klakeys popup window](images/popupscreenshot.png)
 
 ---
 
-## File Structure:
+## File Structure
 
-```
+```text
 klakeys
 ├── README.md
 ├── background.js
@@ -51,14 +51,14 @@ klakeys
 3. Choose **Load unpacked** and select this folder.
 4. Open a regular webpage and start typing in an input or text area.
 
-Klakeys cannot run on Chrome's internal pages, the Chrome Web Store, and some 
-exceptional pages.
+Klakeys cannot run on Chrome's internal pages, the Chrome Web Store, or certain pages.
 
 ## Planned
 
 - Custom sound packs and profiles
+- Keystroke display
 - Typing heatmap
 
 ---
 
-Built for fun and learning
+Built for fun and learning. xD

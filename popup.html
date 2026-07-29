@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Klakeys</title>
   <link rel="stylesheet" href="popup.css">
 </head>
@@ -14,7 +15,24 @@
         <h1>Klakeys</h1>
         <p>Keyboard sound and typing pace.</p>
       </div>
-      <span id="version" class="version" aria-label="Extension version"></span>
+
+      <div class="header-actions">
+        <button
+          id="themeToggle"
+          class="theme-toggle"
+          type="button"
+          aria-label="Switch to dark mode"
+          title="Switch to dark mode"
+        >
+          <span id="themeIcon" aria-hidden="true">☾</span>
+        </button>
+
+        <span
+          id="version"
+          class="version"
+          aria-label="Extension version"
+        ></span>
+      </div>
     </header>
 
     <section class="section" aria-labelledby="soundHeading">
@@ -28,6 +46,7 @@
           <strong>Keyboard sounds</strong>
           <small>Play sounds in text fields</small>
         </span>
+
         <input
           id="enabledToggle"
           class="check"
@@ -41,6 +60,7 @@
           <label for="volumeSlider">Volume</label>
           <output id="volumeValue" for="volumeSlider">30%</output>
         </div>
+
         <input
           id="volumeSlider"
           type="range"
@@ -55,11 +75,13 @@
 
     <section class="section" aria-labelledby="displayHeading">
       <h2 id="displayHeading">Display</h2>
+
       <label class="option">
         <span>
           <strong>Floating WPM</strong>
           <small>Keep your current pace visible on webpages</small>
         </span>
+
         <input
           id="overlayToggle"
           class="check"
@@ -75,6 +97,7 @@
       <label class="exceptions-label" for="excludedSites">
         Disable Klakeys on these sites
       </label>
+
       <textarea
         id="excludedSites"
         rows="4"
@@ -86,35 +109,53 @@
         Add one domain per line. Subdomains are included.
       </small>
 
-      <button id="saveExceptionsButton" class="text-button" type="button">
+      <button
+        id="saveExceptionsButton"
+        class="text-button"
+        type="button"
+      >
         Save sites
       </button>
     </section>
 
-    <section class="section stats-section" aria-labelledby="statsHeading">
+    <section
+      class="section stats-section"
+      aria-labelledby="statsHeading"
+    >
       <div class="section-title">
         <div>
           <h2 id="statsHeading">Today</h2>
           <span id="statsDate" class="date"></span>
         </div>
-        <button id="resetStatsButton" class="text-button" type="button">
+
+        <button
+          id="resetStatsButton"
+          class="text-button"
+          type="button"
+        >
           Reset
         </button>
       </div>
 
       <div class="stats">
         <div class="stat">
-          <span class="stat-value" id="wpmValue">0</span>
+          <span id="wpmValue" class="stat-value">0</span>
           <span class="stat-label">WPM</span>
         </div>
+
         <div class="stat">
-          <span class="stat-value" id="wordValue">0</span>
+          <span id="wordValue" class="stat-value">0</span>
           <span class="stat-label">Words typed</span>
         </div>
       </div>
     </section>
 
-    <p id="message" class="message" role="status" aria-live="polite"></p>
+    <p
+      id="message"
+      class="message"
+      role="status"
+      aria-live="polite"
+    ></p>
   </main>
 
   <script src="popup.js"></script>

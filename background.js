@@ -25,6 +25,7 @@ function getToday() {
 
 function toNonNegativeNumber(value) {
   const number = Number(value);
+  
   return Number.isFinite(number) ? Math.max(0, number) : 0;
 }
 
@@ -132,7 +133,7 @@ chrome.runtime.onInstalled.addListener(() => {
     )
     .then(() => getStats())
     .catch(() => {
-      // Storage reads still use the same defaults if initialization fails.
+      
     });
 });
 
@@ -151,6 +152,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
   if (message.type === "RECORD_TYPING") {
     const update = statsUpdateQueue
+
       .then(() => recordTyping(message.data || {}))
       .then((stats) => {
         sendResponse({ success: true, stats });
@@ -166,6 +168,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
   if (message.type === "RESET_STATS") {
     const update = statsUpdateQueue
+
       .then(() => resetStats())
       .then((stats) => {
         sendResponse({ success: true, stats });
