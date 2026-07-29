@@ -18,4 +18,4 @@
 
 ---
 
-Built for fun and learning ⌨️
+Built for fun and learning

@@ -9,45 +9,84 @@
 </head>
 
 <body>
+  <main class="popup">
+    <header>
+      <div>
+        <h1>Klakeys</h1>
+        <p>Mechanical sounds while you type.</p>
+      </div>
 
-<main class="popup">
+      <span id="version" class="version" aria-label="Extension version"></span>
+    </header>
 
-  <header>
-    <h1>Klakeys</h1>
-    <p>Mechanical keyboard sounds for your browser.</p>
-  </header>
+    <section class="setting">
+      <div>
+        <strong>Keyboard sounds</strong>
+        <span id="statusText" role="status">Enabled</span>
+      </div>
 
-  <section class="setting">
-    <div>
-      <strong>Sounds</strong>
-      <span id="statusText">Enabled</span>
-    </div>
+      <label class="switch">
+        <input
+          id="enabledToggle"
+          type="checkbox"
+          aria-label="Enable keyboard sounds"
+        >
+        <span class="slider"></span>
+      </label>
+    </section>
 
-    <label class="switch">
-      <input id="enabledToggle" type="checkbox">
-      <span class="slider"></span>
-    </label>
-  </section>
+    <section class="volume-section">
+      <div class="section-heading">
+        <label for="volumeSlider">Volume</label>
+        <span id="volumeValue">30%</span>
+      </div>
 
-  <section class="volume-section">
-    <div class="volume-heading">
-      <label for="volumeSlider">Volume</label>
-      <span id="volumeValue">45%</span>
-    </div>
+      <input
+        id="volumeSlider"
+        type="range"
+        min="0"
+        max="100"
+        step="1"
+        value="30"
+        aria-describedby="volumeValue"
+      >
+    </section>
 
-    <input
-      id="volumeSlider"
-      type="range"
-      min="0"
-      max="100"
-      value="45">
-  </section>
+    <section class="stats-section">
+      <div class="section-heading">
+        <div>
+          <strong>Today</strong>
+          <span id="statsDate"></span>
+        </div>
 
-  <footer>
-    v0.1
-  </footer>
-</main>
+        <button id="resetStatsButton" type="button" title="Reset today's stats">
+          Reset
+        </button>
+      </div>
 
-<script src="popup.js"></script>
+      <div class="stats-grid">
+        <div class="stat">
+          <span class="stat-value" id="wpmValue">0</span>
+          <span class="stat-label">WPM</span>
+        </div>
+
+        <div class="stat">
+          <span class="stat-value" id="keystrokeValue">0</span>
+          <span class="stat-label">Keys</span>
+        </div>
+
+        <div class="stat">
+          <span class="stat-value" id="wordValue">0</span>
+          <span class="stat-label">Words</span>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <span>Sounds only work inside webpages.</span>
+    </footer>
+  </main>
+
+  <script src="popup.js"></script>
 </body>
 </html>
